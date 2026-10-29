@@ -1,6 +1,6 @@
 /* Planner service worker: keeps the app working offline.
    When you release a change, bump VERSION so phones pick up the update. */
-const VERSION = 'planner-1.0';
+const VERSION = 'planner-1.1';
 const CORE = [
   './',
   'index.html',
@@ -17,7 +17,9 @@ const CDN = 'https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(VERSION).then((cache) =>
-      cache.addAll(CORE).then(() => cache.add(new Request(CDN, { mode: 'cors' })).catch(() => {}))
+      // cache: 'reload' skips the browser's HTTP cache so an update always stores fresh files
+      cache.addAll(CORE.map((u) => new Request(u, { cache: 'reload' })))
+        .then(() => cache.add(new Request(CDN, { mode: 'cors' })).catch(() => {}))
     )
   );
 });
